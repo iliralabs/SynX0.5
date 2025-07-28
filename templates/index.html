@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WCAG Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">WCAG Scanner</h1>
+    <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://example.com)" class="w-full p-2 mb-4 border rounded">
+    <button id="scanButton" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Scan</button>
+    <div id="results" class="mt-4 text-gray-700"></div>
+  </div>
+  <script>
+    document.getElementById('scanButton').addEventListener('click', () => {
+      const url = document.getElementById('urlInput').value;
+      if (url) {
+        fetch(`/scan?url=${encodeURIComponent(url)}`)
+          .then(response => response.json())
+          .then(data => {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2 class="text-lg font-semibold">Scan Results:</h2>';
+            if (data.violations.length > 0) {
+              data.violations.forEach(v => {
+                resultsDiv.innerHTML += `<p><strong>${v.impact}:</strong> ${v.description}</p>`;
+              });
+            } else {
+              resultsDiv.innerHTML += '<p>No violations found!</p>';
+            }
+          })
+          .catch(error => {
+            document.getElementById('results').innerHTML = `<p>Error: ${error.message}</p>`;
+          });
+      } else {
+        document.getElementById('results').innerHTML = '<p>Please enter a URL.</p>';
+      }
+    });
+  </script>
+</body>
+</html>
